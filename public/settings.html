@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Stock Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="header-left">
+                    <button class="sidebar-toggle" onclick="toggleSidebar()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1><i class="fas fa-cog"></i> Settings</h1>
+                </div>
+            </div>
+        </header>
+
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h3>Navigation</h3>
+                <button class="sidebar-close" onclick="toggleSidebar()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="index.html" class="sidebar-link">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="new-product.html" class="sidebar-link">
+                    <i class="fas fa-plus"></i>
+                    <span>Add Product</span>
+                </a>
+                <a href="settings.html" class="sidebar-link active">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <button class="sidebar-link logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Sidebar Overlay -->
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+        <!-- Settings Content -->
+        <main class="settings-content">
+            <!-- Slack Notifications Section -->
+            <div class="settings-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-bell"></i> Slack Notifications</h2>
+                    <p>Get notified when products go out of stock</p>
+                </div>
+                
+                <div class="settings-card">
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h3>Enable Slack Notifications</h3>
+                            <p>Receive notifications in Slack when products go out of stock</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="slackEnabled">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item" id="slackConfig" style="display: none;">
+                        <div class="setting-info">
+                            <h3>Slack Webhook URL</h3>
+                            <p>Your Slack webhook URL for sending notifications</p>
+                        </div>
+                        <div class="input-group">
+                            <input type="url" id="slackWebhook" placeholder="https://hooks.slack.com/services/...">
+                            <button class="btn btn-secondary" onclick="testSlackWebhook()">
+                                <i class="fas fa-paper-plane"></i> Test
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="setting-item" id="slackChannelConfig" style="display: none;">
+                        <div class="setting-info">
+                            <h3>Slack Channel</h3>
+                            <p>Channel to send notifications to (optional - uses webhook default)</p>
+                        </div>
+                        <input type="text" id="slackChannel" placeholder="#stock-alerts">
+                    </div>
+
+                    <div class="setting-item" id="notificationSettings" style="display: none;">
+                        <div class="setting-info">
+                            <h3>Notification Settings</h3>
+                            <p>Configure when and how to receive notifications</p>
+                        </div>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="notifyOutOfStock" checked>
+                                <span class="checkmark"></span>
+                                Notify when product goes out of stock
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="notifyBackInStock">
+                                <span class="checkmark"></span>
+                                Notify when product comes back in stock
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="notifyPriceChange">
+                                <span class="checkmark"></span>
+                                Notify on price changes
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Automatic Refresh Section -->
+            <div class="settings-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-sync-alt"></i> Automatic Refresh</h2>
+                    <p>Automatically check product stock levels</p>
+                </div>
+                
+                <div class="settings-card">
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h3>Enable Automatic Refresh</h3>
+                            <p>Automatically refresh product data at regular intervals</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="autoRefreshEnabled">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item" id="refreshConfig" style="display: none;">
+                        <div class="setting-info">
+                            <h3>Refresh Interval</h3>
+                            <p>How often to check for stock updates</p>
+                        </div>
+                        <div class="input-group">
+                            <input type="number" id="refreshInterval" min="1" max="1440" value="30">
+                            <select id="refreshUnit">
+                                <option value="minutes">Minutes</option>
+                                <option value="hours">Hours</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="setting-item" id="refreshSettings" style="display: none;">
+                        <div class="setting-info">
+                            <h3>Refresh Settings</h3>
+                            <p>Configure automatic refresh behavior</p>
+                        </div>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="refreshOnlyOutOfStock" checked>
+                                <span class="checkmark"></span>
+                                Only refresh products that are out of stock
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="refreshOnPageFocus">
+                                <span class="checkmark"></span>
+                                Refresh when returning to the page
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="showRefreshNotifications">
+                                <span class="checkmark"></span>
+                                Show notifications for refresh results
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="setting-item" id="refreshSchedule" style="display: none;">
+                        <div class="setting-info">
+                            <h3>Active Hours</h3>
+                            <p>Only refresh during these hours (optional)</p>
+                        </div>
+                        <div class="time-range">
+                            <div class="time-input">
+                                <label>Start Time:</label>
+                                <input type="time" id="refreshStartTime" value="09:00">
+                            </div>
+                            <div class="time-input">
+                                <label>End Time:</label>
+                                <input type="time" id="refreshEndTime" value="18:00">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- General Settings Section -->
+            <div class="settings-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-sliders-h"></i> General Settings</h2>
+                    <p>Other application preferences</p>
+                </div>
+                
+                <div class="settings-card">
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h3>Data Retention</h3>
+                            <p>How long to keep historical data</p>
+                        </div>
+                        <select id="dataRetention">
+                            <option value="7">7 days</option>
+                            <option value="30" selected>30 days</option>
+                            <option value="90">90 days</option>
+                            <option value="365">1 year</option>
+                            <option value="0">Keep forever</option>
+                        </select>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h3>Default Stock Threshold</h3>
+                            <p>Default threshold for "low stock" warnings</p>
+                        </div>
+                        <input type="number" id="defaultStockThreshold" min="0" value="5" placeholder="5">
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h3>Theme</h3>
+                            <p>Choose your preferred theme</p>
+                        </div>
+                        <select id="theme">
+                            <option value="light" selected>Light</option>
+                            <option value="dark">Dark</option>
+                            <option value="auto">Auto (system)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Role Management Section -->
+            <div class="settings-section" id="roleManagementSection" style="display: none;">
+                <div class="section-header">
+                    <h2><i class="fas fa-users-cog"></i> Role Management</h2>
+                    <p>Manage users and their permissions</p>
+                </div>
+                
+                <div class="settings-card">
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h3>Current User</h3>
+                            <p>Your current role and permissions</p>
+                        </div>
+                        <div class="user-role-info">
+                            <span class="role-badge" id="currentUserRole">Loading...</span>
+                        </div>
+                    </div>
+
+                    <div class="setting-item" id="userManagementSection" style="display: none;">
+                        <div class="setting-info">
+                            <h3>User Management</h3>
+                            <p>Add, edit, or remove users</p>
+                        </div>
+                        <button class="btn btn-primary" onclick="showAddUserModal()">
+                            <i class="fas fa-user-plus"></i> Add User
+                        </button>
+                    </div>
+
+                    <div class="setting-item" id="userListSection" style="display: none;">
+                        <div class="setting-info">
+                            <h3>Users</h3>
+                            <p>Manage existing users</p>
+                        </div>
+                        <div class="users-list" id="usersList">
+                            <!-- Users will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Save Button -->
+            <div class="settings-actions">
+                <button class="btn btn-primary" onclick="saveSettings()">
+                    <i class="fas fa-save"></i> Save Settings
+                </button>
+                <button class="btn btn-secondary" onclick="resetSettings()">
+                    <i class="fas fa-undo"></i> Reset to Defaults
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="settings.js"></script>
+</body>
+</html> 

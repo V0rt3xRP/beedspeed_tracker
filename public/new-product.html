@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Product - Stock Monitor Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="header-left">
+                    <button class="sidebar-toggle" onclick="toggleSidebar()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1><i class="fas fa-plus"></i> Add New Product</h1>
+                </div>
+            </div>
+        </header>
+
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h3>Navigation</h3>
+                <button class="sidebar-close" onclick="toggleSidebar()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="index.html" class="sidebar-link">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="new-product.html" class="sidebar-link active">
+                    <i class="fas fa-plus"></i>
+                    <span>Add Product</span>
+                </a>
+                <a href="settings.html" class="sidebar-link">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <button class="sidebar-link logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Sidebar Overlay -->
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+        <!-- Tabs -->
+        <div class="tabs-container" style="margin-bottom: 30px;">
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('individual')">
+                    <i class="fas fa-plus"></i> Individual Product
+                </button>
+                <button class="tab-btn" onclick="switchTab('bulk')">
+                    <i class="fas fa-upload"></i> Bulk Upload (CSV)
+                </button>
+            </div>
+        </div>
+
+        <!-- Individual Product Tab -->
+        <div id="individual-tab" class="tab-content active">
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-plus-circle"></i> Add New Product</h3>
+                </div>
+                <form id="addProductForm" class="product-form">
+                    <div class="form-group">
+                        <label for="url">Product URL *</label>
+                        <input type="url" id="url" name="url" required placeholder="https://example.com/product">
+                        <small class="form-help">Enter the product URL - we'll automatically detect the product details!</small>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="stockSelector">Stock Status Selector (Optional)</label>
+                            <input type="text" id="stockSelector" name="stockSelector" placeholder="cat-store-product-stock">
+                            <small class="form-help">CSS selector or div ID for stock status</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="nameSelector">Product Name Selector (Optional)</label>
+                            <input type="text" id="nameSelector" name="nameSelector" placeholder="cat-store-product-title">
+                            <small class="form-help">CSS selector or div ID for product name</small>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="imageSelector">Product Image Selector (Optional)</label>
+                        <input type="text" id="imageSelector" name="imageSelector" placeholder="cat-store-product-main">
+                        <small class="form-help">CSS selector or div ID for product image</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="beedspeedCode">Beedspeed Code (Optional)</label>
+                        <input type="text" id="beedspeedCode" name="beedspeedCode" placeholder="Enter Beedspeed Code">
+                        <small class="form-help">Manually enter the Beedspeed code for this product</small>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" id="testScrapeBtn" class="btn btn-secondary">
+                            <i class="fas fa-vial"></i> Test Scrape
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Add Product
+                        </button>
+                    </div>
+                </form>
+                
+                <!-- Test Results -->
+                <div id="testResults" class="test-results hidden">
+                    <h3><i class="fas fa-flask"></i> Test Results</h3>
+                    <div id="testResultsContent"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bulk Upload Tab -->
+        <div id="bulk-tab" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-upload"></i> Bulk Upload Products</h3>
+                </div>
+                <div class="bulk-upload-content">
+                    <div class="upload-area" id="uploadArea">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <h4>Upload CSV File</h4>
+                        <p>Drag and drop your CSV file here or click to browse</p>
+                        <input type="file" id="csvFile" accept=".csv" style="display: none;">
+                        <button type="button" class="btn btn-secondary" onclick="document.getElementById('csvFile').click()">
+                            <i class="fas fa-folder-open"></i> Choose File
+                        </button>
+                    </div>
+                    
+                    <div class="csv-template">
+                        <h4><i class="fas fa-download"></i> Download CSV Template</h4>
+                        <p>Use this template to format your CSV file correctly:</p>
+                        <button type="button" class="btn btn-secondary" onclick="downloadCSVTemplate()">
+                            <i class="fas fa-download"></i> Download Template
+                        </button>
+                    </div>
+                    
+                    <div class="csv-preview hidden" id="csvPreview">
+                        <h4><i class="fas fa-table"></i> CSV Preview</h4>
+                        <div id="previewTable"></div>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" onclick="clearCSV()">
+                                <i class="fas fa-times"></i> Clear
+                            </button>
+                            <button type="button" class="btn btn-primary" onclick="uploadCSV()">
+                                <i class="fas fa-upload"></i> Upload Products
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="new-product.js"></script>
+</body>
+</html> 

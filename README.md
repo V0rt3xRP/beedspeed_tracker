@@ -1,256 +1,163 @@
-# 🚀 Rayspeed Stock Tracker
+# Rayspeed Stock Tracker
 
-A full-stack web application for tracking competitor product availability in real-time using web scraping and Supabase.
+A full-stack stock tracking application for competitor products with web scraping capabilities.
 
-## ✨ Features
+## Features
 
-- **Add competitor product URLs** to track
-- **Custom CSS selectors** for stock status, product name, and images
-- **Real-time web scraping** using Cheerio
-- **Beautiful dashboard** with modern UI
-- **CRUD operations** - Create, Read, Update, Delete products
-- **Individual and bulk refresh** capabilities
-- **Responsive design** for all devices
-- **Toast notifications** for user feedback
-- **Error handling** and graceful fallbacks
+- 🔍 **Web Scraping**: Automatically scrape product information from competitor websites
+- 📊 **Stock Monitoring**: Track stock status, prices, and availability
+- 🔔 **Notifications**: Slack integration for stock alerts
+- 🎯 **Smart Detection**: Auto-detect product selectors or use custom ones
+- 🔐 **Authentication**: User management with role-based permissions
+- 📱 **Responsive UI**: Modern, mobile-friendly interface
 
-## 🛠 Tech Stack
+## Railway Deployment
 
-- **Backend**: Node.js + Express
-- **Database**: Supabase (PostgreSQL)
-- **Web Scraping**: Cheerio + Axios
-- **Frontend**: Vanilla JavaScript + HTML + CSS
-- **Styling**: Modern CSS with gradients and animations
+This application is configured to run on Railway.app. Follow these steps to deploy:
 
-## 📋 Prerequisites
+### 1. Prerequisites
 
-- Node.js (v14 or higher)
+- Railway account (sign up at [railway.app](https://railway.app))
+- Supabase project with the required database schema
+
+### 2. Deploy to Railway
+
+1. **Fork/Clone this repository** to your GitHub account
+2. **Connect to Railway**:
+   - Go to [railway.app](https://railway.app)
+   - Click "New Project"
+   - Select "Deploy from GitHub repo"
+   - Choose your repository
+
+3. **Set Environment Variables**:
+   - In your Railway project dashboard, go to "Variables" tab
+   - Add the following environment variables:
+
+```env
+# Supabase Configuration
+SUPABASE_URL=your_supabase_url
+SUPABASE_ANON_KEY=your_supabase_anon_key
+
+# Server Configuration
+PORT=3000
+NODE_ENV=production
+
+# Authentication - Valid Users (JSON format)
+VALID_USERS={"admin":{"password":"your_secure_password","role":"admin","name":"Administrator","permissions":["read","write","delete","settings","users"]}}
+```
+
+4. **Deploy**: Railway will automatically build and deploy your application
+
+### 3. Database Setup
+
+Make sure your Supabase database has the required `tracked_urls` table. Run the SQL from `database-setup.sql` in your Supabase SQL editor.
+
+## Local Development
+
+### Prerequisites
+
+- Node.js 20.0.0 or higher
 - npm or yarn
 - Supabase account and project
 
-## 🚀 Quick Start
+### Setup
 
-### 1. Clone and Install
+1. **Clone the repository**:
+   ```bash
+   git clone <your-repo-url>
+   cd stock-tracker
+   ```
 
-```bash
-git clone <repository-url>
-cd stock-tracker
-npm install
-```
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
 
-### 2. Set up Supabase
+3. **Environment setup**:
+   ```bash
+   cp env.example .env
+   ```
+   Edit `.env` with your Supabase credentials and other settings.
 
-1. Create a new project at [supabase.com](https://supabase.com)
-2. Go to your project dashboard
-3. Navigate to **SQL Editor**
-4. Run the following SQL to create the required table:
+4. **Start development server**:
+   ```bash
+   npm run dev
+   ```
+
+5. **Access the application**:
+   - Dashboard: http://localhost:3000
+   - Test scraping: http://localhost:3000/api/test-scrape?url=YOUR_URL
+
+## API Endpoints
+
+### Products
+- `GET /api/products` - Get all tracked products
+- `POST /api/products` - Add new product (with automatic scraping)
+- `PUT /api/products/:id` - Update product
+- `DELETE /api/products/:id` - Delete product
+- `POST /api/products/:id/scrape` - Re-scrape product
+
+### Testing
+- `GET /api/test-scrape?url=URL` - Test scraping without saving
+
+### Authentication
+- `POST /api/auth/login` - User login
+- `GET /api/auth/me` - Get current user info
+- `POST /api/auth/logout` - User logout
+
+### Notifications
+- `POST /api/test-slack` - Test Slack webhook
+- `POST /api/notify-slack` - Send Slack notification
+
+## Environment Variables
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `SUPABASE_URL` | Your Supabase project URL | Yes |
+| `SUPABASE_ANON_KEY` | Your Supabase anonymous key | Yes |
+| `PORT` | Server port (Railway sets this automatically) | No |
+| `NODE_ENV` | Environment (development/production) | No |
+| `VALID_USERS` | JSON string of valid users and passwords | Yes |
+
+## Database Schema
+
+The application requires a `tracked_urls` table in Supabase with the following structure:
 
 ```sql
 CREATE TABLE tracked_urls (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    url TEXT NOT NULL,
-    product_name TEXT,
-    image_url TEXT,
-    stock_status TEXT,
-    stock_selector TEXT NOT NULL,
-    name_selector TEXT NOT NULL,
-    image_selector TEXT NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  id UUID PRIMARY KEY,
+  url TEXT NOT NULL,
+  product_name TEXT,
+  stock_status TEXT,
+  price TEXT,
+  image_url TEXT,
+  stock_selector TEXT,
+  name_selector TEXT,
+  image_selector TEXT,
+  beedspeed_code TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
-
--- Enable Row Level Security (optional but recommended)
-ALTER TABLE tracked_urls ENABLE ROW LEVEL SECURITY;
-
--- Create a policy that allows all operations (for development)
-CREATE POLICY "Allow all operations" ON tracked_urls FOR ALL USING (true);
 ```
 
-### 3. Configure Environment Variables
-
-1. Copy the environment example file:
-```bash
-cp env.example .env
-```
-
-2. Edit `.env` and add your Supabase credentials:
-```env
-SUPABASE_URL=your_supabase_project_url
-SUPABASE_ANON_KEY=your_supabase_anon_key
-PORT=3000
-NODE_ENV=development
-```
-
-You can find these values in your Supabase project settings under **API**.
-
-### 4. Start the Application
-
-```bash
-# Development mode with auto-reload
-npm run dev
-
-# Production mode
-npm start
-```
-
-The application will be available at `http://localhost:3000`
-
-## 📖 Usage Guide
-
-### Adding a New Product
-
-1. **Find the product URL** you want to track
-2. **Inspect the page** to find CSS selectors for:
-   - Stock status (e.g., `.availability`, `#stock-status`)
-   - Product name (e.g., `.product-title`, `h1`)
-   - Product image (e.g., `.product-image img`, `.main-image`)
-3. **Fill out the form** with the URL and selectors
-4. **Click "Add Product"** - the system will automatically scrape the data
-
-### CSS Selector Examples
-
-| Element | Example Selectors |
-|---------|-------------------|
-| Stock Status | `.availability`, `#stock-status`, `.stock-indicator` |
-| Product Name | `.product-title`, `h1`, `.item-name` |
-| Product Image | `.product-image img`, `.main-image`, `img[alt*="product"]` |
-
-### Managing Products
-
-- **Refresh**: Click the "Refresh" button to re-scrape a single product
-- **Edit**: Modify URL or selectors for better data extraction
-- **Delete**: Remove products you no longer want to track
-- **Refresh All**: Update all products at once
-
-## 🔧 API Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/api/products` | Get all tracked products |
-| `POST` | `/api/products` | Add new product |
-| `PUT` | `/api/products/:id` | Update product |
-| `DELETE` | `/api/products/:id` | Delete product |
-| `POST` | `/api/products/:id/scrape` | Re-scrape product data |
-
-## 📁 Project Structure
-
-```
-stock-tracker/
-├── public/                 # Frontend files
-│   ├── index.html         # Main dashboard
-│   ├── styles.css         # Styling
-│   └── script.js          # Frontend logic
-├── services/              # Backend services
-│   ├── database.js        # Supabase operations
-│   └── scraper.js         # Web scraping logic
-├── server.js              # Express server
-├── package.json           # Dependencies
-├── env.example            # Environment template
-└── README.md              # This file
-```
-
-## 🎨 Features in Detail
-
-### Web Scraping
-- Uses **Cheerio** for HTML parsing
-- Supports **CSS selectors** (classes, IDs, attributes)
-- Handles **relative URLs** automatically
-- **Error handling** with fallback values
-- **User-Agent** spoofing to avoid blocks
-
-### Database
-- **Supabase** PostgreSQL backend
-- **UUID** primary keys
-- **Timestamps** for tracking updates
-- **Row Level Security** ready
-
-### Frontend
-- **Responsive design** for mobile and desktop
-- **Real-time updates** without page refresh
-- **Modal dialogs** for edit/delete operations
-- **Toast notifications** for user feedback
-- **Loading states** and error handling
-
-## 🚨 Troubleshooting
-
-### Common Issues
-
-1. **"Not found" values**: Check your CSS selectors - they might be incorrect
-2. **Scraping fails**: Some sites block automated requests - try different selectors
-3. **Database connection**: Verify your Supabase credentials in `.env`
-4. **CORS errors**: The server includes CORS middleware for cross-origin requests
-
-### Debug Mode
-
-Enable debug logging by setting:
-```env
-NODE_ENV=development
-```
-
-## 🔒 Security Considerations
-
-- **Environment variables** for sensitive data
-- **Input validation** on all endpoints
-- **Error handling** to prevent information leakage
-- **Rate limiting** recommended for production
-- **HTTPS** required for production deployment
-
-## 🚀 Deployment
-
-### Heroku
-```bash
-# Add Heroku remote
-heroku create your-app-name
-
-# Set environment variables
-heroku config:set SUPABASE_URL=your_url
-heroku config:set SUPABASE_ANON_KEY=your_key
-
-# Deploy
-git push heroku main
-```
-
-### Vercel
-```bash
-# Install Vercel CLI
-npm i -g vercel
-
-# Deploy
-vercel
-```
-
-### Docker
-```dockerfile
-FROM node:16-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci --only=production
-COPY . .
-EXPOSE 3000
-CMD ["npm", "start"]
-```
-
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Add tests if applicable
+4. Test thoroughly
 5. Submit a pull request
 
-## 📄 License
+## License
 
-MIT License - see LICENSE file for details
+MIT License - see LICENSE file for details.
 
-## 🆘 Support
+## Support
 
-If you encounter any issues:
-
-1. Check the troubleshooting section
-2. Review the console logs for errors
-3. Verify your Supabase configuration
-4. Open an issue with detailed error information
+For issues and questions:
+- Create an issue in this repository
+- Contact the development team
 
 ---
 
-**Built with ❤️ by Rayspeed Team** 
+**Note**: This application is configured for Railway deployment with automatic builds and deployments from your GitHub repository. 

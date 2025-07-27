@@ -4,6 +4,7 @@ let filteredProducts = [];
 let autoRefreshInterval = null;
 let settings = {};
 let currentUser = null;
+require('dotenv').config();
 
 // DOM elements
 const addProductForm = document.getElementById('addProductForm');
